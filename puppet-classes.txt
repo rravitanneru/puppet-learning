@@ -1,0 +1,121 @@
+1. Manifests are smaller unit of the execution in puppet like (sample playbook or a recipe)
+2. Classes in puppet is noting but grouping multiple manifests into a sigle file 
+examples:
+
+Manifests-example:
+
+package { 'apache2' :
+         ensure => present
+}
+
+Class-example:
+
+class classname {
+package { 'apache2' :
+ 
+           ensure => present,
+
+
+}
+service { 'apache2' :
+
+        ensure => running,
+}
+
+
+}
+
+3.Modules: Modules are grouping classes into a single declaration
+
+   a. To create  modules first we need find the current module path
+   b. to know the current module path execute this command
+   
+       # puppet config print modulepath
+       
+   c. Note that path, navigate to that path like
+   /etc/puppetlabs/code/environments/production/modules
+   
+   d.create a folder like this to install a cowsay package for the learing sack
+      # sudo mkdir -p cowsay/manifests
+      
+      
+4. create a class in this moudle/cowsay.manifests folder
+  Note:  for puppet every  main class has to include in init.pp
+  
+  like this
+  
+     cowsay.pp
+     
+       class cowsay {
+       package { 'cowsay' :
+                ensure => present,
+                provider => 'gem',
+                
+       }
+       
+       }
+      
+5. Include this class in init.pp
+
+class init {
+
+}
+
+or 
+
+write main class inside init.pp gives you more flexibility
+
+
+init.pp
+ class cowsay {
+       package { 'cowsay' :
+                ensure => present,
+                provider => 'gem',
+                
+       }
+       
+      }
+      
+ 
+6. How to include this on catlog of the node
+7. For this to happen to /etc/puppetlabs/code/environments/production/site.pp
+8.  include a node definiton here
+
+site.pp
+
+node 'ravi' {
+include cowsay  # only main class name no need include the init.pp
+
+}
+
+
+Extending the module with another class
+
+creating another classs
+
+fortune.pp
+
+class cowsay::fortune (indicating cowsay as main class ){
+      package { 'fortune-mod' :
+             ensure => present
+             
+      
+      }
+
+}
+
+9. Include this class in main class aka init.pp
+
+init.pp changes like this 
+init.pp
+ class cowsay {
+       package { 'cowsay' :
+                ensure => present,
+                provider => 'gem',
+                
+       }
+       
+       include cowsay::fortune
+      }
+
+10 No need to include in site.pp
